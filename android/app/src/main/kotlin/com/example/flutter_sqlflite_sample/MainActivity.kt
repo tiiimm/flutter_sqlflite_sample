@@ -1,4 +1,4 @@
-package com.example.flutter_sqlflite_sample
+package com.example.flutter_mysql_sample
 
 import io.flutter.embedding.android.FlutterActivity
 
