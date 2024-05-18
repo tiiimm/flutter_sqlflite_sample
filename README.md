@@ -1,4 +1,4 @@
-# flutter_mysql_sample
+# flutter_sqlflite_sample
 
 A new Flutter project.
 

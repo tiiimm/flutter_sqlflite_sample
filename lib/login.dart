@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bcrypt/flutter_bcrypt.dart';
-import 'package:flutter_mysql_sample/db_connection.dart';
-import 'package:flutter_mysql_sample/home.dart';
-import 'package:flutter_mysql_sample/main.dart';
+import 'package:sqflite/sqflite.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,25 +12,14 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController textUsername = TextEditingController();
   TextEditingController textPassword = TextEditingController();
   bool hidden = true;
-  
-  Future<bool> verifyPassword(String hashedPassword) async {
-    return await FlutterBcrypt.verify(password: textPassword.text, hash: hashedPassword);
-  }
 
-  Future<List> login() async {
-    final dbHelper = DatabaseHelper();
-    await dbHelper.connect();
-    final conn = dbHelper.connection;
-
-    var results = await conn!.query('SELECT * FROM users WHERE username= ?', [textUsername.text]);
-    List rows = results.map((row) => row.fields).toList();
-    if (rows.isNotEmpty) {
-      if (await verifyPassword(rows[0]['password'].toString())) {
-        return rows;
-      }
-    }
-
-    return [];
+  Future<List<Map>> login() async {
+    Database db = await openDatabase('example_database.db');
+    //below are two approaches to execute query, choose whichever you are comfortable with.
+    // final List<Map> users = await db.query('users', where: 'username=? AND password=?', whereArgs: [textUsername.text, textPassword.text]);
+    final List<Map> users = await db.rawQuery('SELECT * FROM users WHERE username=? AND password=?', [textUsername.text, textPassword.text]);
+    db.close();
+    return users;
   }
 
   @override
@@ -112,10 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 onPressed: () {
                   login().then((value) {
                     if (value.isNotEmpty) {
-                      sharedPreferences.setString('username', value[0]['username']);
-                      Navigator.pushReplacement(context, MaterialPageRoute<void>(
-                        builder: (BuildContext context) => HomeScreen(username: value[0]['username']),
-                      ),);
+                      Navigator.pushReplacementNamed(context, '/home', arguments: {'userId': value[0]['id'], 'username': value[0]['username']});
                     }
                     else {
                       ScaffoldMessenger.of(context).showSnackBar(
