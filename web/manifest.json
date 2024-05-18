@@ -1,6 +1,6 @@
 {
-    "name": "flutter_sqlflite_sample",
-    "short_name": "flutter_sqlflite_sample",
+    "name": "flutter_mysql_sample",
+    "short_name": "flutter_mysql_sample",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
